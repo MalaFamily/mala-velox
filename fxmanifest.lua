@@ -3,30 +3,41 @@ use_experimental_fxv2_oal 'yes'
 lua54        'yes'
 game 'gta5'
 
-description "Autovelox"
 author "ithurtslikehell_"
 version '1.0.0'
 
-shared_script '@ox_lib/init.lua'
+description 'Autovelox system based on mala-fakeplate by ch-velox'
+discord "https://discord.gg/r8qbjatjqx"
+discord_hell "https://discord.gg/2UThJVJ7mK"
+tebex " https://malastore.tebex.io/"
+
+dependencies {
+    "oxmysql",
+    "ox_lib",
+    "/onesync",
+    "PolyZone"
+}
+
+shared_scripts {
+    '@ox_lib/init.lua',
+    "shared.lua",
+    'langs.lua'
+}
 
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
-    'config.lua',
-    'langs.lua',
     'server.lua',
 }
 
 client_scripts {
     '@PolyZone/client.lua',
     '@PolyZone/CircleZone.lua',
-    'config.lua',
-    'langs.lua',
-    'client.lua',
+    "clients/editable.lua",
+	"clients/main.lua",
 }
 
 escrow_ignore {
-    'clients/open.lua',
-    'servers/open.lua',
-    'config.lua',
-    'langs.lua',
+    "langs.lua",
+    "configs/**.lua",
+    "*/editable.lua",
 }

@@ -1,11 +1,29 @@
+function GetVehicleOwner(model, plate)
+    local done, res = false, false
+    MySQL.Async.fetchAll('SELECT * FROM `owned_vehicles` WHERE `plate` = ?' --[[.. ' `model` = ?']], {
+        plate
+        -- ['@model'] = string.lower(model),
+    }, function(result)
+        if result[1] then
+            res = result[1].owner or nil
+        end
+
+        done = true
+    end)
+
+    while not done do Citizen.Wait(10) end
+
+    return res
+end
+exports('GetVehicleOwner', GetVehicleOwner)
+
 lib.callback.register("ch-velox:server:isVehicleOwned", function(source, model, plate)   
-    local res = exports['ch-misc']:GetVehicleOwner(model, plate, true)
+    local res = GetVehicleOwner(model, plate)
 
     return (res ~= nil and res ~= false) and true or false
 end)
 
-RegisterServerEvent('ch-velox:server:giveBill', function(velocity, multiplier, max_velocity)
-    local src = source
+lib.callback.register("ch-velox:server:isVehicleOwned", function(source, velocity, multiplier, max_velocity)   
     multiplier = multiplier or 1
     local velocity_difference = velocity - max_velocity
 
@@ -15,13 +33,11 @@ RegisterServerEvent('ch-velox:server:giveBill', function(velocity, multiplier, m
 
     -- Aggiunta della fattura
     if cost then
-        exports["ch-billings"]:addToBill("velox" .. src, "Eccesso di velocità : " .. velocity_difference .. " km/h evasi!", cost or 100)
-        -- TriggerEvent("ch-billings:addToBill", label or "", amount or 100)
-        Citizen.Wait(150)
-        TriggerEvent("ch-billings:giveBill", 0, false, src, false, 'society_police', "velox" .. src)
-        Citizen.Wait(100)
-        exports["ch-billings"]:clearBill("velox" .. src)
+        -- TODO : Integrate your billing system
+
+        return true
     else
         print('cost doesn\'t exist')
+        return false
     end
 end)

@@ -1,22 +1,17 @@
-ESX = exports['es_extended']:getSharedObject()
-Hell = exports['ch-lib']:getLib()
-
 local Autovelox, blips = {}, {}
 local isInVelox = false
 
-Citizen.CreateThread(function()
-    while not ESX.GetPlayerData().job do Citizen.Wait(100) end
+IsPedDriver = function(vehicle, ped)
+    if not ped then ped = GetPlayerPed(-1) end
+    if not vehicle then print("ERROR : NO VEHICLE TO CHECK") return false end
+    return GetPedInVehicleSeat(vehicle, -1) == ped
+end
 
-    ESX.PlayerData = ESX.GetPlayerData()
+Citizen.CreateThread(function()
+    while not getPlayerJob() do Citizen.Wait(100) end
 
     CreateBlips()
-end)
 
-RegisterNetEvent("esx:setJob")
-AddEventHandler("esx:setJob", function(job) ESX.PlayerData.job = job CreateBlips() end)
-
-Citizen.CreateThread(function()
-    -- VelocityRadarTaken()
     for _, v in ipairs(Config.VelocityRadar) do
         local velox = CircleZone:Create(vector2(v.pos.x, v.pos.y), v.radius, {
             name = v.name,
@@ -35,10 +30,10 @@ Citizen.CreateThread(function()
             local ped = GetPlayerPed(-1)
             isInVelox = isPointInside
 
-            if isInVelox and IsPedInAnyVehicle(ped, false) and not Config.blacklisted_jobs[ESX.PlayerData.job.name] then
+            if isInVelox and IsPedInAnyVehicle(ped, false) and not Config.blacklisted_jobs[getPlayerJob()] then
                 local vehicle = GetVehiclePedIsIn(ped, false)
 
-                if Hell.IsPedDriver(vehicle, ped) then
+                if IsPedDriver(vehicle, ped) then
                     local velocity = GetEntitySpeed(vehicle) * (Config.useKMH and 3.6 or 2.236936)
 
                     if velocity >= Config.VelocityRadar[idx].max_speed then
@@ -51,8 +46,7 @@ Citizen.CreateThread(function()
                             color = { r, g, b }
                         }
 
-                        print(point)
-                        Config.CallPolice(point, "Veicolo ad alta velocità al " .. Config.VelocityRadar[idx].name, data)
+                        Config.CallPolice(point, string.format(Langs["vehicle_dispatch"], Config.VelocityRadar[idx].name), data)
                         VelocityRadarTaken(data, velocity, Config.VelocityRadar[idx].multiplier, Config.VelocityRadar[idx].max_speed)
                     end
                 end
@@ -61,9 +55,8 @@ Citizen.CreateThread(function()
     end
 end)
 
-
 function VelocityRadarTaken(data, velocity_atm, multiplier, max_speed)
-    Config.Notification("Fai CHEEES!\nStavi andando a " .. math.floor(velocity_atm) .. "KM/h", "info", 5000, "AUTOVELOX")
+    Notify(string.format(Langs["velox_notification"], math.floor(velocity_atm)), "info", 5000, "AUTOVELOX")
 
     SetGpsFlashes(true)
     FlashMinimapDisplay()
@@ -81,11 +74,12 @@ function VelocityRadarTaken(data, velocity_atm, multiplier, max_speed)
     end, data.model, data.plate)
     while not done do Citizen.Wait(10) end
 
-    print("Is Vehicle owned", owned)
+    -- print("Is Vehicle owned", owned)
     if owned then
-        Hell.tse('ch-velox:server:giveBill', velocity_atm, multiplier, max_speed)
+        lib.callback('ch-velox:server:giveBill', false, function(billGived)
+        end, velocity_atm, multiplier, max_speed)
     else
-        Config.Notification("Il veicolo non è stato riconosciuto...", "info", 5000, "AUTOVELOX")
+        Notify(Langs["vehicle_hidden"], "info", 5000, Langs["autovelox"])
     end
 
     FlashMinimapDisplay()
@@ -100,14 +94,14 @@ function CreateBlips()
     for _, val in ipairs(Config.VelocityRadar) do
         local blip = AddBlipForCoord(val.pos.x, val.pos.y, val.pos.z)
         SetBlipSprite(blip, 184)
-        SetBlipDisplay(blip, Config.blacklisted_jobs[ESX.PlayerData.job.name] and 4 or 5)
+        SetBlipDisplay(blip, Config.blacklisted_jobs[getPlayerJob()] and 4 or 5)
         SetBlipScale(blip, 0.8)
         SetBlipColour(blip, 3)
 
         SetBlipAsShortRange(blip, true)
 
         BeginTextCommandSetBlipName("STRING")
-        AddTextComponentString("Autovelox")
+        AddTextComponentString(Langs["autovelox"])
         EndTextCommandSetBlipName(blip)
         table.insert(blips, blip)
     end

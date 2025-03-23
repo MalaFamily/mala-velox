@@ -1,4 +1,7 @@
 Config = {
+    Framework = 'auto',
+    Inventory = 'auto',
+
     VelocityRadar = {
         { pos = vector4(239.2288, 446.2526, 121.4822, 0.0), radius = 30, max_speed = 75, name = "Civ. 587", settings = { useZ = false, debugPoly = false, debugColor = { 255, 0, 0} } },
         { pos = vector4(-1772.4283, 71.7926, 68.8273, 0.0), radius = 30, max_speed = 75, name = "Civ. 639", settings = { useZ = false, debugPoly = false, debugColor = { 255, 0, 0} } },
@@ -20,10 +23,9 @@ Config = {
     },
     
     GetVehicleModelName = function(vehicle)
-        -- USE THIS IF U HAVEN'T OTHER VERSION
-        -- return string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle)))
+        return string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle)))
 
-        return exports["ch-garages"]:GetVehicleModel(GetEntityModel(vehicle))
+        -- return exports["ch-garages"]:GetVehicleModel(GetEntityModel(vehicle))
     end,
     
     CallPolice = function(cds, msg, data)
@@ -36,34 +38,10 @@ Config = {
             metadata = {
                 model = data.model,
                 plate = data.plate,
-                speed = data.velocity .. ' KM/h' ,
+                speed = data.velocity .. ( Config.useKMH and ' KM/h' or " MPH/h") ,
                 name = 'Limite di velocità',
                 color = data.color
             }
         })
     end,
-
-    -- CLIENT SIDE
-    Notification = function(...)
-        local message, _type, time, title = ...
-        if IsDuplicityVersion() then return end -- Don't touch this
-        -- MODIFY
-        if not ESX then ESX = exports['es_extended']:getSharedObject() end
-        if ESX then
-            ESX.ShowNotification(message, _type, time, title)
-        end
-    end,
-
-    -- CLIENT SIDE
-    updateDeath = function(val)
-        -- MODIFY
-        if not ESX then ESX = exports['es_extended']:getSharedObject() end
-        if ESX then
-            ESX.SetPlayerData("dead", val)
-        end
-    end,
-
-    isPlayerDeath = function()
-        return exports['ch-death']:IsDead()
-    end
 }
