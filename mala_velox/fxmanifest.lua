@@ -1,43 +1,49 @@
 fx_version 'cerulean'
-use_experimental_fxv2_oal 'yes'
-lua54        'yes'
 game 'gta5'
 
-author "ithurtslikehell_"
-version '1.0.0'
+use_experimental_fxv2_oal 'yes'
+lua54 'yes'
 
-description 'Autovelox system based on mala-fakeplate by ch-velox'
+author "ithurtslikehell_"
+version '1.0.2'
+
+description 'Autovelox system based on mala_fakeplate by ch-velox'
 discord "https://discord.gg/r8qbjatjqx"
 discord_hell "https://discord.gg/2UThJVJ7mK"
 tebex " https://malastore.tebex.io/"
 
 dependencies {
-    "oxmysql",
     "ox_lib",
+    "oxmysql",
     "/onesync",
     "PolyZone"
+}
+
+files {
+    "config.lua",
+    "locales/*.json"
 }
 
 shared_scripts {
     '@ox_lib/init.lua',
     "shared.lua",
-    'langs.lua'
+    "config.lua"
 }
 
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
-    'server.lua',
+    'server/main.lua',
 }
 
 client_scripts {
     '@PolyZone/client.lua',
     '@PolyZone/CircleZone.lua',
-    "clients/editable.lua",
-	"clients/main.lua",
+    "client/editable.lua",
+	"client/main.lua",
 }
 
 escrow_ignore {
-    "langs.lua",
-    "configs/**.lua",
+    "config.lua",
+    "locales/*.json",
     "*/editable.lua",
 }

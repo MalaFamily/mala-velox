@@ -1,0 +1,6 @@
+{
+    "velox_notification" : "Slow DOWN!\nYou are going at %s KM/h",
+    "vehicle_hidden" : "The vehicle was not recognized...",
+    "autovelox" : "Speed Camera",
+    "vehicle_dispatch" : "High-speed vehicle at %s"
+}

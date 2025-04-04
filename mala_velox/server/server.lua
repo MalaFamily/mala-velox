@@ -1,6 +1,6 @@
 function GetVehicleOwner(model, plate)
     local done, res = false, false
-    MySQL.Async.fetchAll('SELECT * FROM `owned_vehicles` WHERE `plate` = ?' --[[.. ' `model` = ?']], {
+    MySQL.query('SELECT * FROM `owned_vehicles` WHERE `plate` = ?' --[[.. ' `model` = ?']], {
         plate
         -- ['@model'] = string.lower(model),
     }, function(result)
